@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Drive</title>
+    <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+           
+    <nav class="navbar">
+        <h1>Welcome, <%= user.username %>!</h1>
+        <a href="/logout" class="btn-logout">Logout</a>
+    </nav>
+
+    <div class="main-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="side-option1">
+                <h2>Create New Folder</h2>
+                <p>Enter you folder name here!!</p>
+                <form action="/create-folder" method="POST">
+                    <input type="text" name="folderName" placeholder="Folder name" required>
+                    <button type="submit" class="btn">Create Folder</button>
+                </form>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="side-option2">
+                <h2>Upload a New File</h2>
+                <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="fileToUpload" required>
+                    <button type="submit" class="btn2">Upload</button>
+                </form>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <h2>Your Files & Folders</h2>
+            <div id="fileList">
+                <% if (files.length === 0) { %>
+                    <p>Your drive is empty. Upload a file or create a folder to get started!</p>
+                <% } else { %>
+                    <% files.forEach(item => { %>
+                        <div class="file-item">
+                            <span class="file-name">
+                                <% if (item.type === 'folder') { %>
+                                    📁 <%= item.name %>
+                                <% } else { %>
+                                    📄 <%= item.name %>
+                                <% } %>
+                            </span>
+                            
+                            <div class="file-actions">
+                                <% if (item.type === 'file') { %>
+                                    <a href="/download/<%= item.storage_key %>" class="btn-download">Download</a>
+                                <% } %>
+
+                                <form action="/delete/<%= item.id %>" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this?');">
+                                    <button type="submit" class="btn-delete">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </main>
+
+    </div>
+</body>
+</html>

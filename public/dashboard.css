@@ -1,0 +1,160 @@
+    /* 1. Your new color palette and font */
+        :root {
+            --background-color: #250902;
+            --primary-color: #38040e;
+            --secondary-color: #640d14;
+            --accent-color: #ad2831;
+            --text-color: white;
+            --text-color-light: white;
+            --font-family: "Montserrat", sans-serif;
+        }
+
+        /* 2. Applying the new theme */
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--primary-color);
+            padding: 0 20px;
+            border-bottom: 1px solid var(--secondary-color);
+            height: 60px;
+        }
+
+        .navbar h1 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .btn-logout {
+            background-color: var(--accent-color);
+            color: var(--text-color-light);
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: filter 0.2s ease-in-out;
+        }
+        
+        .btn-logout:hover {
+            filter: brightness(1.2);
+        }
+
+        .main-container {
+            display: flex;
+        }
+
+        .side-option1, .side-option2{
+            height: 200px;
+            width: 240px;
+            padding: 10px;
+            margin-left: -5px;
+            border: 1px solid var(   --accent-color);
+            background-color: var( --secondary-color);
+            border-radius: 10px;
+        }
+        .side-option1 .btn,
+        .side-option2 .btn2{
+            height: 40px;
+            background-color: var( --accent-color);
+            width: 100%;
+            padding: 10px;
+            color: var(--text-color-light);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .side-option1 .btn:hover{
+            height: 42px;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            padding: 20px;
+            height: calc(100vh - 61px);
+            border-right: 1px solid var(--secondary-color);
+        }
+        
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-section h2 {
+            font-size: 1.2em;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .sidebar-section input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            background-color: var(--background-color);
+            border: 1px solid var(--secondary-color);
+            color: var(--text-color);
+            border-radius: 4px;
+        }
+
+        /* Basic styling for file input in dark mode */
+        .sidebar-section input[type="file"] {
+            width: 100%;
+            margin-bottom: 10px;
+            color-scheme: dark;
+        }
+    
+        .content-area {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--primary-color);
+            border: 1px solid var(--secondary-color);
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .file-name {
+            font-size: 1.1em;
+        }
+
+        .file-actions a,
+        .file-actions button {
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-left: 10px;
+            font-size: 0.9em;
+            transition: filter 0.2s ease-in-out;
+        }
+        
+        .btn-download {
+            background-color: var(--secondary-color);
+            color: var(--text-color-light);
+        }
+        
+        .btn-delete {
+            background-color: var(--accent-color);
+            color: var(--text-color-light);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-download:hover,
+        .btn-delete:hover {
+            filter: brightness(1.2);
+        }

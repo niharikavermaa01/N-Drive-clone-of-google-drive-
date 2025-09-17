@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login -N-Drive</title>
+    <link rel="stylesheet" href="/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <img src="/logo.png" alt="Nebula Logo">
+        <a href="/about"><i class="fa-solid fa-circle-info"></i>  About</a>
+    </nav>
+
+    <main class="main-content">
+        <div class="auth-container">
+            <h1>Welcome Back</h1>
+            <p class="subtitle">Login to access your drive</p>
+            
+            <% if (typeof error !== 'undefined' && error) { %>
+                <p class="error-message"><%= error %></p>
+            <% } %>
+
+            <form action="/login" method="POST">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Username" 
+                        required
+                        value="<%= typeof username !== 'undefined' ? username : '' %>"
+                    >
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <p class="signup-link">
+                Don't have an account? <a href="/signup">Sign Up</a>
+            </p>
+        </div>
+    </main>
+</body>
+</html>

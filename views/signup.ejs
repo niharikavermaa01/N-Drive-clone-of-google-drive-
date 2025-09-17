@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sign Up</title>
+    <style>
+        :root {
+            --background-color: #250902;
+            --primary-color: #38040e;
+            --secondary-color: #640d14;
+            --accent-color: #ad2831;
+            --text-color: white;
+            --text-color-light: white;
+            --font-family: "Montserrat", sans-serif;
+        }
+
+        /* Global Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Auth Container Styling */
+        .auth-container {
+            background-color: var(--primary-color);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        /* Left Section */
+        .left-section {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border-right: 1px solid var(--secondary-color);
+        }
+
+        .left-section h1 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            text-align: center;
+        }
+
+        /* Right Section */
+        .right-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .right-section .info-heading {
+            text-align: left;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: var(--text-color-light);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: var(--secondary-color);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            color: var(--text-color);
+            font-size: 1rem;
+            font-family: var(--font-family);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-color-light);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px rgba(233, 69, 96, 0.4);
+        }
+
+        form button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        form button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px black;
+        }
+
+        form button:active {
+            transform: translateY(-1px);
+        }
+
+        .signup-link {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-color-light);
+            text-align: center;
+        }
+
+        .signup-link a {
+            color: #ffb3c1;
+            font-weight: 600;
+            text-decoration: none;
+            border: 2px solid var(--accent-color);
+            transition: opacity 0.3s ease;
+            border-radius: 15px;
+            padding: 4px;
+        }
+
+        .signup-link a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background-color: #e945602a;
+            color: #e94560;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e94560;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                flex-direction: column;
+                max-width: 90%;
+            }
+
+            .left-section {
+                border-right: none;
+                border-bottom: 1px solid var(--secondary-color);
+                padding-bottom: 20px;
+            }
+
+            .right-section {
+                padding-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Left Section -->
+        <div class="left-section">
+            <h1>Create Your Drive Account</h1>
+        </div>
+
+        <!-- Right Section -->
+        <div class="right-section">
+            <form action="/signup" method="POST">
+                <div class="info-heading">Enter your Gmail account only</div>
+                <div class="input-group">
+                    <input type="text" name="username" placeholder="Username" required autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Password" required>
+                </div>
+                <button type="submit">Sign Up</button>
+            </form>
+            <p class="signup-link">Already have an account? <a href="/login">Login</a></p>
+        </div>
+    </div>
+</body>
+</html>

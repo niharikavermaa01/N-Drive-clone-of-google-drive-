@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All about N-drive</title>
+    <link rel="stylesheet" href="/about.css">
+     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <div class="about-container">
+        <div class="about-a">
+            <h2>About N-Drive</h2>
+            Your Personal Cloud Storage Solution
+            N-Drive is a full-stack cloud storage application developed as a clone of the popular Google Drive service. It is designed to replicate the core functionalities of a modern cloud storage platform, providing users with a secure and intuitive interface to manage their digital files. This project serves as a comprehensive demonstration of modern web development principles, showcasing a robust architecture from the front-end user interface to the back-end server logic and database management.
+        </div>
+        <div class="about-b">
+            <h2>Core Functionalities</h2>
+        <ol>
+            <li><b>Secure User Authentication:</b> Users can create an account, log in, and log out securely. The system uses JSON Web Tokens (JWT) to manage user sessions, ensuring that only authenticated users can access their files.</li>
+            <li><b>File & Folder Uploads:</b> Users can easily upload files and create new folders. The interface supports drag-and-drop functionality for a smoother user experience.</li>
+            <li><b>Intuitive File Management:</b> Once logged in, users are presented with a clean dashboard where they can:
+                <ul>
+                    <li>View all their files and folders in a hierarchical structure.</li>
+                    <li>Create, rename, and delete files and folders.</li>
+                    <li>Navigate into folders to organize their content.</li>
+                </ul>
+            </li>
+            <li><b>File Downloading:</b> Users can select any of their uploaded files and download them directly to their local machine with a single click.</li>
+            <li><b>Basic File Sharing:</b> N-Drive implements a simple sharing mechanism where a user can generate a unique, shareable link for any file. Anyone with the link can view or download the file.</li>
+            <li><b>Responsive Design:</b> The user interface is built to be fully responsive, providing a seamless experience across desktops, tablets, and mobile devices.</li>
+        </ol>
+        </div>
+        <div class="about-c">
+            <h2>Technology Stack for N-Drive</h2>
+            <h4>Back-End</h4>
+            <ul>
+                <li>Node.js: The JavaScript runtime environment for executing the server-side code</li>
+                <li>Express.js: The core web application framework used for routing, middleware management, and handling HTTP requests and responses.</li>
+                <li>Express-Session: Middleware for creating and managing user login sessions.</li>
+                <li>Express-MySQL-Session: A session store that enables session data to be persisted in the MySQL database, ensuring users remain logged in even after a server restart.</li>
+                <li>Dependencies: Bcrypt, express, multer, ejs </li>
+            </ul>
+            <h4>Front-End</h4>
+            <ul>
+                <li>EJS (Embedded JavaScript): A templating engine used for Server-Side Rendering (SSR). The server uses EJS templates to dynamically generate HTML pages with user-specific data before sending them to the client's browser.</li>
+                <li>HTML, CSS, JavaScript: Standard front-end technologies served from the public directory to style the application and add client-side interactivity.</li>
+            </ul>
+            <h4>Databases</h4>
+            <ul>
+                <li>MySQL: A robust and widely-used relational database (SQL). It is used to store all application data, including user credentials and file metadata.</li>
+                <li>mysql2: A modern, high-performance Node.js driver for connecting to the MySQL database, configured to use promises for cleaner asynchronous code (async/await).</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
