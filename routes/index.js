@@ -5,8 +5,6 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
-// --- Middleware ---
-// Protects routes by ensuring the user is logged in
 const isAuthenticated = (req, res, next) => {
     if (req.session.userId) {
         return next();
@@ -14,16 +12,13 @@ const isAuthenticated = (req, res, next) => {
     res.redirect('/login');
 };
 
-// --- Multer Configuration ---
-// Configures file storage, creating a unique folder for each user
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const userUploadsPath = path.join('uploads', req.session.userId.toString());
-        fs.mkdirSync(userUploadsPath, { recursive: true }); // Ensure directory exists
+        fs.mkdirSync(userUploadsPath, { recursive: true });
         cb(null, userUploadsPath);
     },
     filename: (req, file, cb) => {
-        // Prepend a timestamp to the filename to avoid naming conflicts
         const uniqueFilename = Date.now() + '-' + file.originalname;
         cb(null, uniqueFilename);
     }
@@ -111,7 +106,6 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
     }
 });
 
-// Handle file uploads and save metadata to the database
 router.post('/upload', isAuthenticated, upload.single('fileToUpload'), async (req, res) => {
     if (!req.file) {
         return res.redirect('/dashboard?error=NoFileUploaded');
@@ -151,7 +145,6 @@ router.post('/create-folder', isAuthenticated, async (req, res) => {
     }
 });
 
-// Handle deleting a file or folder
 router.post('/delete/:id', isAuthenticated, async (req, res) => {
     const { id } = req.params;
     const userId = req.session.userId;
@@ -164,7 +157,6 @@ router.post('/delete/:id', isAuthenticated, async (req, res) => {
         }
         const itemToDelete = rows[0];
 
-        // If it's a file, delete the physical copy from the server
         if (itemToDelete.type === 'file') {
             const filePath = path.join('uploads', userId.toString(), itemToDelete.storage_key);
             fs.unlink(filePath, (err) => {
@@ -172,7 +164,7 @@ router.post('/delete/:id', isAuthenticated, async (req, res) => {
             });
         }
         
-        // Delete the record from the database
+
         await db.query('DELETE FROM resources WHERE id = ?', [id]);
         
         res.redirect('/dashboard');
@@ -182,11 +174,9 @@ router.post('/delete/:id', isAuthenticated, async (req, res) => {
     }
 });
 
-// Handle file downloads
 router.get('/download/:filename', isAuthenticated, (req, res) => {
     const { filename } = req.params;
     const filePath = path.join('uploads', req.session.userId.toString(), filename);
-    // Use the original name for the downloaded file for a better user experience
     res.download(filePath, (err) => {
         if (err) {
             console.error("File download error:", err);
