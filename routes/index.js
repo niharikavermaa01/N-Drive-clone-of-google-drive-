@@ -163,7 +163,6 @@ router.post('/delete/:id', isAuthenticated, async (req, res) => {
                 if (err) console.error("Error deleting physical file:", err);
             });
         }
-        
 
         await db.query('DELETE FROM resources WHERE id = ?', [id]);
         
