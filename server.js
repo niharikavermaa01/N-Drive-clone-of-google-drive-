@@ -8,11 +8,10 @@ const MySQLStore = require('express-mysql-session')(session);
 const app = express();
 const PORT = 3000;
 
-// --- IMPORTANT: Update with your MySQL credentials ---
 const dbOptions = {
     host: 'localhost',
     user: 'root',
-    password: 'nike01vk.$', // Your MySQL password (often empty for local setups)
+    password: 'nike01vk.$', 
     database: 'drive_clone'
 };
 
