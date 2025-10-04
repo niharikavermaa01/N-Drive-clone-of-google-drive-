@@ -5,6 +5,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
+// Middleware to check if the user is authenticated
 const isAuthenticated = (req, res, next) => {
     if (req.session.userId) {
         return next();
@@ -12,6 +13,9 @@ const isAuthenticated = (req, res, next) => {
     res.redirect('/login');
 };
 
+// !!! WARNING: THIS FILE STORAGE METHOD IS NOT COMPATIBLE WITH RENDER !!!
+// The local 'uploads' folder will be deleted when the server restarts.
+// You MUST replace this with a cloud storage service like Amazon S3.
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const userUploadsPath = path.join('uploads', req.session.userId.toString());
@@ -33,22 +37,26 @@ router.get('/about', (req, res) => res.render('about'));
 
 // Handle new user registration
 router.post('/signup', async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, email } = req.body;
     const db = req.app.get('db');
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const [result] = await db.query(
-            'INSERT INTO users (username, password) VALUES (?, ?)',
-            [username, hashedPassword]
+        // CORRECTED: Changed query to use PostgreSQL placeholders ($1, $2, $3)
+        const result = await db.query(
+            'INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING id',
+            [username, hashedPassword, email]
         );
-        // Create an uploads folder for the new user
-        fs.mkdirSync(path.join('uploads', result.insertId.toString()), { recursive: true });
+        const newUserId = result.rows[0].id;
+
+        // WARNING: This creates a local folder that will be deleted on Render.
+        fs.mkdirSync(path.join('uploads', newUserId.toString()), { recursive: true });
         res.redirect('/login');
     } catch (error) {
         console.error("Signup Error:", error);
         let errorMessage = 'An error occurred during registration.';
-        if (error.code === 'ER_DUP_ENTRY') {
-            errorMessage = 'That username is already taken. Please choose another.';
+        // CORRECTED: Changed error code for PostgreSQL unique violation
+        if (error.code === '23505') {
+            errorMessage = 'That username or email is already taken.';
         }
         res.render('signup', { error: errorMessage });
     }
@@ -59,13 +67,13 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const db = req.app.get('db');
     try {
-        const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+        // CORRECTED: Changed query to use PostgreSQL placeholder ($1)
+        const { rows } = await db.query('SELECT * FROM users WHERE username = $1', [username]);
         const user = rows[0];
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.render('login', { error: 'Incorrect username or password.', username });
         }
-        // Create a session on successful login
         req.session.userId = user.id;
         req.session.username = user.username;
         res.redirect('/dashboard');
@@ -79,34 +87,35 @@ router.post('/login', async (req, res) => {
 router.get('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
-            return res.redirect('/dashboard'); // Redirect to dashboard if error
+            return res.redirect('/dashboard');
         }
-        res.clearCookie('drive_clone_session'); // Clear the session cookie
+        res.clearCookie('connect.sid'); // Default cookie name for express-session
         res.redirect('/login');
     });
 });
 
 // --- Drive Functionality Routes (Protected) ---
 
-// Display the dashboard with files and folders from the database
+// Display the dashboard
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
         const db = req.app.get('db');
-        const user = { username: req.session.username };
         const userId = req.session.userId;
-        // Fetch root items (where parent_id is NULL) for the logged-in user
-        const [items] = await db.query(
-            'SELECT * FROM resources WHERE user_id = ? AND parent_id IS NULL ORDER BY type DESC, name ASC',
+        // CORRECTED: Changed query to use PostgreSQL placeholder ($1)
+        const { rows } = await db.query(
+            'SELECT * FROM resources WHERE user_id = $1 AND parent_id IS NULL ORDER BY type DESC, name ASC',
             [userId]
         );
-        res.render('dashboard', { user, files: items });
+        res.render('dashboard', { user: { username: req.session.username }, files: rows });
     } catch (error) {
         console.error("Dashboard Error:", error);
         res.render('dashboard', { user: { username: req.session.username }, files: [] });
     }
 });
 
+// Handle file upload
 router.post('/upload', isAuthenticated, upload.single('fileToUpload'), async (req, res) => {
+    // WARNING: This whole function relies on the local filesystem.
     if (!req.file) {
         return res.redirect('/dashboard?error=NoFileUploaded');
     }
@@ -114,8 +123,9 @@ router.post('/upload', isAuthenticated, upload.single('fileToUpload'), async (re
         const db = req.app.get('db');
         const { originalname, filename } = req.file;
         const userId = req.session.userId;
+        // CORRECTED: Changed query to use PostgreSQL placeholders
         await db.query(
-            'INSERT INTO resources (user_id, type, name, storage_key) VALUES (?, ?, ?, ?)',
+            'INSERT INTO resources (user_id, type, name, storage_key) VALUES ($1, $2, $3, $4)',
             [userId, 'file', originalname, filename]
         );
         res.redirect('/dashboard');
@@ -129,13 +139,14 @@ router.post('/upload', isAuthenticated, upload.single('fileToUpload'), async (re
 router.post('/create-folder', isAuthenticated, async (req, res) => {
     const { folderName } = req.body;
     const userId = req.session.userId;
-    if (!folderName || folderName.trim() === '') {
+    if (!folderName || !folderName.trim()) {
         return res.redirect('/dashboard?error=FolderNameRequired');
     }
     try {
         const db = req.app.get('db');
+        // CORRECTED: Changed query to use PostgreSQL placeholders
         await db.query(
-            'INSERT INTO resources (user_id, type, name) VALUES (?, ?, ?)',
+            'INSERT INTO resources (user_id, type, name) VALUES ($1, $2, $3)',
             [userId, 'folder', folderName.trim()]
         );
         res.redirect('/dashboard');
@@ -145,12 +156,15 @@ router.post('/create-folder', isAuthenticated, async (req, res) => {
     }
 });
 
+// Handle item deletion
 router.post('/delete/:id', isAuthenticated, async (req, res) => {
+    // WARNING: This function relies on the local filesystem.
     const { id } = req.params;
     const userId = req.session.userId;
     try {
         const db = req.app.get('db');
-        const [rows] = await db.query('SELECT * FROM resources WHERE id = ? AND user_id = ?', [id, userId]);
+        // CORRECTED: Changed query to use PostgreSQL placeholders
+        const { rows } = await db.query('SELECT * FROM resources WHERE id = $1 AND user_id = $2', [id, userId]);
 
         if (rows.length === 0) {
             return res.status(404).send('Item not found or permission denied.');
@@ -164,8 +178,8 @@ router.post('/delete/:id', isAuthenticated, async (req, res) => {
             });
         }
 
-        await db.query('DELETE FROM resources WHERE id = ?', [id]);
-        
+        // CORRECTED: Changed query to use PostgreSQL placeholder
+        await db.query('DELETE FROM resources WHERE id = $1', [id]);
         res.redirect('/dashboard');
     } catch (error) {
         console.error("Delete Error:", error);
@@ -173,13 +187,15 @@ router.post('/delete/:id', isAuthenticated, async (req, res) => {
     }
 });
 
+// Handle file download
 router.get('/download/:filename', isAuthenticated, (req, res) => {
+    // WARNING: This function relies on the local filesystem.
     const { filename } = req.params;
     const filePath = path.join('uploads', req.session.userId.toString(), filename);
     res.download(filePath, (err) => {
         if (err) {
             console.error("File download error:", err);
-            res.status(404).send('File not found or permission denied.');
+            res.status(404).send('File not found.');
         }
     });
 });

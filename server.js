@@ -2,32 +2,33 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const routes = require('./routes/index');
-const mysql = require('mysql2');
-const MySQLStore = require('express-mysql-session')(session);
+const { Pool } = require('pg'); // Use the 'pg' library for PostgreSQL
+const pgSession = require('connect-pg-simple')(session); // Use the PostgreSQL session store
 
 const app = express();
-const PORT = 3000;
+// Use the PORT environment variable provided by Render
+const PORT = process.env.PORT || 3000;
 
-const dbOptions = {
-    host: 'localhost',
-    user: 'root',
-    password: 'nike01vk.$', 
-    database: 'drive_clone'
-};
+// --- Database Connection ---
+// This will automatically use the DATABASE_URL you set in Render's environment
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // Required for connecting to Render's database
+  }
+});
 
-// Create a connection pool for the database
-const pool = mysql.createPool(dbOptions).promise();
-
-// Make the database pool available to all routes
+// Make the database pool available to all your routes
 app.set('db', pool);
 
 // --- Session Configuration ---
-const sessionStore = new MySQLStore({}, pool);
-
+// Use the new PostgreSQL-compatible session store
 app.use(session({
-    key: 'drive_clone_session',
-    secret: 'myloveisonlyhimandnoonecanreplacehim', // Replace with a long random string
-    store: sessionStore,
+    store: new pgSession({
+        pool: pool,
+        tableName: 'user_sessions' // Name for the session table in your database
+    }),
+    secret: process.env.SESSION_SECRET || 'a-very-strong-secret-for-development', // Best practice: use an environment variable
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -48,5 +49,5 @@ app.use('/', routes);
 
 // --- Start Server ---
 app.listen(PORT, () => {
-    console.log(`✅ Server is running on http://localhost:${PORT}`);
+    console.log(`✅ Server is running on port ${PORT}`);
 });
